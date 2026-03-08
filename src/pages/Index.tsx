@@ -219,7 +219,7 @@ const Index = () => {
                       </button>
                     </div>
 
-                    {activeTab === "depth" && <DepthMapDisplay depthMapUrl={depthMap} />}
+                    {activeTab === "depth" && <DepthMapDisplay depthMapUrl={depthMap} onProcessedUrlChange={handleProcessedUrlChange} />}
                     {activeTab === "3d" && (
                       <Suspense
                         fallback={
@@ -228,7 +228,7 @@ const Index = () => {
                           </div>
                         }
                       >
-                        <ReliefViewer depthMapUrl={depthMap} />
+                        <ReliefViewer depthMapUrl={processedDepthMap || depthMap} />
                       </Suspense>
                     )}
 
