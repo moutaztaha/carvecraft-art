@@ -16,7 +16,7 @@ const STORAGE_KEY = "reliefforge-api-config";
 
 const defaultConfig: ApiConfig = {
   mode: "cloud",
-  localEndpoint: "http://localhost:8188",
+  localEndpoint: "http://localhost:8000",
 };
 
 export function getApiConfig(): ApiConfig {
