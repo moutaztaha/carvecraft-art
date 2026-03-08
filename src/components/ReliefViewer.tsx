@@ -406,7 +406,7 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
       {/* 3D Canvas */}
       <div className="w-full h-[500px] rounded-lg overflow-hidden border border-border bg-card">
         <Canvas
-          camera={{ position: [60, -90, 120], fov: 45 }}
+          camera={{ position: [0, -50, 170], fov: 45 }}
           gl={{ antialias: true, alpha: false }}
           shadows
         >
