@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64 } = await req.json();
+    const { imageBase64, quality = "high" } = await req.json();
     if (!imageBase64) {
       return new Response(JSON.stringify({ error: "No image provided" }), {
         status: 400,
@@ -48,14 +48,16 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-pro-image-preview",
+          model: quality === "fast" ? "google/gemini-2.5-flash-image" : "google/gemini-3-pro-image-preview",
           messages: [
             {
               role: "user",
               content: [
                 {
                   type: "text",
-                  text: `You are an expert 3D sculptor and CNC depth map artist. Convert this line art / ornament image into a professional-grade grayscale depth map for CNC bas-relief carving.
+                  text: quality === "fast"
+                    ? `Convert this line art into a grayscale depth map for CNC relief. Use black (0) for background, white (255) for highest points. Create smooth gradients with rounded volumes. Output ONLY the depth map image.`
+                    : `You are an expert 3D sculptor and CNC depth map artist. Convert this line art / ornament image into a professional-grade grayscale depth map for CNC bas-relief carving.
 
 CRITICAL REQUIREMENTS for the depth map:
 1. PURE GRAYSCALE image — no color, no text, no labels, no watermarks

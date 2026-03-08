@@ -13,6 +13,7 @@ const Index = () => {
   const [depthMap, setDepthMap] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<"depth" | "3d">("depth");
+  const [quality, setQuality] = useState<"fast" | "high">("high");
 
   const generateDepthMap = async () => {
     if (!sourceImage) return;
@@ -21,7 +22,7 @@ const Index = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-depth-map", {
-        body: { imageBase64: sourceImage },
+        body: { imageBase64: sourceImage, quality },
       });
 
       if (error) {
@@ -115,7 +116,33 @@ const Index = () => {
                 }}
               />
               {sourceImage && !depthMap && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+                  {/* Quality Selector */}
+                  <div className="flex gap-1 bg-secondary rounded-lg p-1">
+                    <button
+                      onClick={() => setQuality("fast")}
+                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                        quality === "fast"
+                          ? "bg-card text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      ⚡ Fast Preview
+                    </button>
+                    <button
+                      onClick={() => setQuality("high")}
+                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                        quality === "high"
+                          ? "bg-card text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      ✨ High Quality
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center font-mono">
+                    {quality === "fast" ? "Faster generation, basic gradients" : "Slower generation, rich sculptural detail"}
+                  </p>
                   <Button
                     variant="hero"
                     size="lg"
