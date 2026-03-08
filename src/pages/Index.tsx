@@ -22,7 +22,7 @@ const Index = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-depth-map", {
-        body: { imageBase64: sourceImage },
+        body: { imageBase64: sourceImage, quality },
       });
 
       if (error) {
