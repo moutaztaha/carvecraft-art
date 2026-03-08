@@ -367,10 +367,20 @@ interface ReliefViewerProps {
 
 const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
   const [settings, setSettings] = useState<ReliefSettings>(DEFAULT_SETTINGS);
+  const [currentGeometry, setCurrentGeometry] = useState<THREE.BufferGeometry | null>(null);
   const isModified = JSON.stringify(settings) !== JSON.stringify(DEFAULT_SETTINGS);
 
   const update = (key: keyof ReliefSettings, value: number | boolean) =>
     setSettings((prev) => ({ ...prev, [key]: value }));
+
+  const handleExportSTL = () => {
+    if (!currentGeometry) {
+      toast.error("No 3D model to export yet.");
+      return;
+    }
+    exportSTL(currentGeometry, "relief-model.stl");
+    toast.success("STL file downloaded!");
+  };
 
   const sliders: {
     key: keyof ReliefSettings;
@@ -401,7 +411,7 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
           <directionalLight position={[100, -100, 150]} intensity={1.2} castShadow />
           <directionalLight position={[-80, 60, 80]} intensity={0.4} color="hsl(30, 60%, 80%)" />
           <pointLight position={[0, 0, 120]} intensity={0.5} />
-          <ReliefMesh depthMapUrl={depthMapUrl} settings={settings} />
+          <ReliefMeshWithExport depthMapUrl={depthMapUrl} settings={settings} onGeometryReady={setCurrentGeometry} />
           <AutoFit settings={settings} />
           <OrbitControls
             enableZoom
@@ -459,6 +469,12 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
           />
         </div>
       </div>
+
+      {/* Export Button */}
+      <Button onClick={handleExportSTL} variant="hero" size="lg" className="w-full">
+        <Download className="w-5 h-5 mr-2" />
+        Export STL for CNC
+      </Button>
     </div>
   );
 };
