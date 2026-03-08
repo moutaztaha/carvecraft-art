@@ -412,10 +412,12 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
           shadows
         >
           <color attach="background" args={["hsl(220, 15%, 10%)"]} />
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[100, -100, 150]} intensity={1.2} castShadow />
-          <directionalLight position={[-80, 60, 80]} intensity={0.4} color="hsl(30, 60%, 80%)" />
-          <pointLight position={[0, 0, 120]} intensity={0.5} />
+          <ambientLight intensity={0.7} />
+          <directionalLight position={[0, 0, 200]} intensity={1.0} castShadow />
+          <directionalLight position={[100, -100, 150]} intensity={0.6} />
+          <directionalLight position={[-100, 100, 150]} intensity={0.6} />
+          <directionalLight position={[-80, -60, 80]} intensity={0.3} color="hsl(30, 60%, 80%)" />
+          <pointLight position={[0, 0, 120]} intensity={0.4} />
           <ReliefMeshWithExport depthMapUrl={depthMapUrl} settings={settings} onGeometryReady={setCurrentGeometry} />
           <AutoFit settings={settings} />
           <OrbitControls
