@@ -356,11 +356,12 @@ const ReliefMeshWithExport = ({ depthMapUrl, settings, onGeometryReady }: Relief
 function AutoFit({ settings }: { settings: ReliefSettings }) {
   const { camera } = useThree();
   useEffect(() => {
-    const maxDim = Math.max(settings.width, settings.height, settings.baseThickness + settings.reliefDepth);
-    const dist = maxDim * 1.8;
-    // Front-facing view with slight top-down tilt (like looking at a wall-mounted relief)
-    (camera as THREE.PerspectiveCamera).position.set(0, -dist * 0.25, dist * 0.95);
-    camera.lookAt(0, 0, 0);
+    const maxDim = Math.max(settings.width, settings.height);
+    const totalDepth = settings.baseThickness + settings.reliefDepth;
+    const dist = maxDim * 1.6;
+    // Front-facing: camera on +Z looking at the relief face, slight upward tilt
+    (camera as THREE.PerspectiveCamera).position.set(0, maxDim * 0.15, dist);
+    camera.lookAt(0, 0, totalDepth / 2);
   }, [settings.width, settings.height, settings.reliefDepth, settings.baseThickness, camera]);
   return null;
 }
