@@ -403,9 +403,9 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col lg:flex-row gap-4">
       {/* 3D Canvas */}
-      <div className="w-full h-[500px] rounded-lg overflow-hidden border border-border bg-card">
+      <div className="flex-1 h-[500px] rounded-lg overflow-hidden border border-border bg-card">
         <Canvas
           camera={{ position: [0, -50, 170], fov: 45 }}
           gl={{ antialias: true, alpha: false }}
@@ -427,59 +427,61 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
         </Canvas>
       </div>
 
-      {/* Controls */}
-      <div className="rounded-lg border border-border bg-card p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-mono text-muted-foreground uppercase tracking-wider">
-            Model Settings
-          </h4>
-          {isModified && (
-            <button
-              onClick={() => setSettings(DEFAULT_SETTINGS)}
-              className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
-            >
-              <RotateCcw className="w-3 h-3" /> Reset
-            </button>
-          )}
-        </div>
+      {/* Controls Panel */}
+      <div className="lg:w-64 shrink-0 space-y-4">
+        <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-mono text-muted-foreground uppercase tracking-wider">
+              Model Settings
+            </h4>
+            {isModified && (
+              <button
+                onClick={() => setSettings(DEFAULT_SETTINGS)}
+                className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+              >
+                <RotateCcw className="w-3 h-3" /> Reset
+              </button>
+            )}
+          </div>
 
-        {sliders.map(({ key, label, min, max, step, unit }) => (
-          <div key={key} className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">{label}</span>
-              <span className="font-mono text-foreground">
-                {settings[key] as number}
-                {unit}
-              </span>
+          {sliders.map(({ key, label, min, max, step, unit }) => (
+            <div key={key} className="space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">{label}</span>
+                <span className="font-mono text-foreground">
+                  {settings[key] as number}
+                  {unit}
+                </span>
+              </div>
+              <Slider
+                value={[settings[key] as number]}
+                onValueChange={([v]) => update(key, v)}
+                min={min}
+                max={max}
+                step={step}
+              />
             </div>
-            <Slider
-              value={[settings[key] as number]}
-              onValueChange={([v]) => update(key, v)}
-              min={min}
-              max={max}
-              step={step}
+          ))}
+
+          {/* Invert toggle */}
+          <div className="flex items-center justify-between pt-2 border-t border-border">
+            <Label htmlFor="invert" className="text-xs text-muted-foreground">
+              Invert Image
+            </Label>
+            <Switch
+              id="invert"
+              checked={settings.invertImage}
+              onCheckedChange={(v) => update("invertImage", v)}
             />
           </div>
-        ))}
-
-        {/* Invert toggle */}
-        <div className="flex items-center justify-between pt-2 border-t border-border">
-          <Label htmlFor="invert" className="text-xs text-muted-foreground">
-            Invert Image
-          </Label>
-          <Switch
-            id="invert"
-            checked={settings.invertImage}
-            onCheckedChange={(v) => update("invertImage", v)}
-          />
         </div>
-      </div>
 
-      {/* Export Button */}
-      <Button onClick={handleExportSTL} variant="hero" size="lg" className="w-full">
-        <Download className="w-5 h-5 mr-2" />
-        Export STL for CNC
-      </Button>
+        {/* Export Button */}
+        <Button onClick={handleExportSTL} variant="hero" size="lg" className="w-full">
+          <Download className="w-5 h-5 mr-2" />
+          Export STL
+        </Button>
+      </div>
     </div>
   );
 };
