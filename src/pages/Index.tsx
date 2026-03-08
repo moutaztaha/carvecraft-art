@@ -24,6 +24,7 @@ const Index = () => {
     if (!sourceImage) return;
     setIsGenerating(true);
     setDepthMap(null);
+    setProcessedDepthMap(null);
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-depth-map", {
