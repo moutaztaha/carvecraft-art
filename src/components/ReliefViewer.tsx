@@ -342,7 +342,7 @@ const ReliefMeshWithExport = ({ depthMapUrl, settings, onGeometryReady }: Relief
   if (!geometry) return null;
 
   return (
-    <mesh ref={meshRef} geometry={geometry} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
+    <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
       <meshStandardMaterial
         color="hsl(30, 40%, 65%)"
         roughness={0.5}
