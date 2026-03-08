@@ -357,8 +357,9 @@ function AutoFit({ settings }: { settings: ReliefSettings }) {
   const { camera } = useThree();
   useEffect(() => {
     const maxDim = Math.max(settings.width, settings.height, settings.baseThickness + settings.reliefDepth);
-    const dist = maxDim * 1.5;
-    (camera as THREE.PerspectiveCamera).position.set(dist * 0.4, -dist * 0.6, dist * 0.8);
+    const dist = maxDim * 1.8;
+    // Front-facing view with slight top-down tilt (like looking at a wall-mounted relief)
+    (camera as THREE.PerspectiveCamera).position.set(0, -dist * 0.25, dist * 0.95);
     camera.lookAt(0, 0, 0);
   }, [settings.width, settings.height, settings.reliefDepth, settings.baseThickness, camera]);
   return null;
@@ -405,7 +406,7 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
       {/* 3D Canvas */}
       <div className="w-full h-[500px] rounded-lg overflow-hidden border border-border bg-card">
         <Canvas
-          camera={{ position: [60, -90, 120], fov: 45 }}
+          camera={{ position: [0, -50, 170], fov: 45 }}
           gl={{ antialias: true, alpha: false }}
           shadows
         >
