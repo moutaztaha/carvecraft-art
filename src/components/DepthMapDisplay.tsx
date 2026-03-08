@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 interface DepthMapDisplayProps {
   depthMapUrl: string;
+  onProcessedUrlChange?: (url: string) => void;
 }
 
 interface Adjustments {
