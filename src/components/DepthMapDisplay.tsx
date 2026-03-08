@@ -117,45 +117,50 @@ const DepthMapDisplay = ({ depthMapUrl }: DepthMapDisplayProps) => {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="rounded-lg overflow-hidden border border-border bg-card">
-        <img src={processedUrl} alt="Generated depth map" className="w-full h-auto max-h-[400px] object-contain p-4" />
-      </div>
-
-      {/* Adjustment Controls */}
-      <div className="rounded-lg border border-border bg-card p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Adjustments</h4>
-          {isModified && (
-            <button onClick={handleReset} className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
-              <RotateCcw className="w-3 h-3" /> Reset
-            </button>
-          )}
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* Depth Map Image */}
+        <div className="flex-1 rounded-lg overflow-hidden border border-border bg-card">
+          <img src={processedUrl} alt="Generated depth map" className="w-full h-auto max-h-[500px] object-contain p-4" />
         </div>
 
-        {sliders.map(({ key, label, min, max, step, unit }) => (
-          <div key={key} className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">{label}</span>
-              <span className="font-mono text-foreground">
-                {adjustments[key]}
-                {unit}
-              </span>
+        {/* Adjustment Controls */}
+        <div className="lg:w-64 shrink-0 space-y-4">
+          <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-mono text-muted-foreground uppercase tracking-wider">Adjustments</h4>
+              {isModified && (
+                <button onClick={handleReset} className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
+                  <RotateCcw className="w-3 h-3" /> Reset
+                </button>
+              )}
             </div>
-            <Slider
-              value={[adjustments[key]]}
-              onValueChange={([v]) => updateAdjustment(key, v)}
-              min={min}
-              max={max}
-              step={step}
-            />
-          </div>
-        ))}
-      </div>
 
-      <Button onClick={handleDownload} variant="hero" size="lg" className="w-full">
-        <Download className="w-5 h-5 mr-2" />
-        Download Depth Map
-      </Button>
+            {sliders.map(({ key, label, min, max, step, unit }) => (
+              <div key={key} className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="font-mono text-foreground">
+                    {adjustments[key]}
+                    {unit}
+                  </span>
+                </div>
+                <Slider
+                  value={[adjustments[key]]}
+                  onValueChange={([v]) => updateAdjustment(key, v)}
+                  min={min}
+                  max={max}
+                  step={step}
+                />
+              </div>
+            ))}
+          </div>
+
+          <Button onClick={handleDownload} variant="hero" size="lg" className="w-full">
+            <Download className="w-5 h-5 mr-2" />
+            Download Depth Map
+          </Button>
+        </div>
+      </div>
     </motion.div>
   );
 };
