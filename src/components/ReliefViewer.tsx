@@ -3,9 +3,75 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { Slider } from "@/components/ui/slider";
-import { RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RotateCcw, Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
+/** Export a THREE.BufferGeometry as a binary STL file and trigger download. */
+function exportSTL(geometry: THREE.BufferGeometry, filename: string) {
+  // Ensure we have non-indexed geometry for STL
+  const geo = geometry.index ? geometry.toNonIndexed() : geometry;
+  const positions = geo.getAttribute("position");
+  const normals = geo.getAttribute("normal");
+
+  if (!positions) return;
+
+  const triangles = positions.count / 3;
+  const bufferLength = 80 + 4 + triangles * 50; // header + count + triangles
+  const buffer = new ArrayBuffer(bufferLength);
+  const dv = new DataView(buffer);
+
+  // 80-byte header
+  let offset = 80;
+
+  // Number of triangles
+  dv.setUint32(offset, triangles, true);
+  offset += 4;
+
+  const vA = new THREE.Vector3();
+  const vB = new THREE.Vector3();
+  const vC = new THREE.Vector3();
+  const cb = new THREE.Vector3();
+  const ab = new THREE.Vector3();
+
+  for (let i = 0; i < triangles; i++) {
+    const i3 = i * 3;
+
+    vA.fromBufferAttribute(positions, i3);
+    vB.fromBufferAttribute(positions, i3 + 1);
+    vC.fromBufferAttribute(positions, i3 + 2);
+
+    // Compute face normal
+    cb.subVectors(vC, vB);
+    ab.subVectors(vA, vB);
+    cb.cross(ab).normalize();
+
+    // Normal
+    dv.setFloat32(offset, cb.x, true); offset += 4;
+    dv.setFloat32(offset, cb.y, true); offset += 4;
+    dv.setFloat32(offset, cb.z, true); offset += 4;
+
+    // Vertices
+    for (const v of [vA, vB, vC]) {
+      dv.setFloat32(offset, v.x, true); offset += 4;
+      dv.setFloat32(offset, v.y, true); offset += 4;
+      dv.setFloat32(offset, v.z, true); offset += 4;
+    }
+
+    // Attribute byte count
+    dv.setUint16(offset, 0, true); offset += 2;
+  }
+
+  const blob = new Blob([buffer], { type: "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 interface ReliefSettings {
   width: number;
