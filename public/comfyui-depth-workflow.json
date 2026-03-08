@@ -1,0 +1,37 @@
+{
+  "1": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "input.png"
+    }
+  },
+  "2": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "upscale_method": "bicubic",
+      "megapixels": 1.0,
+      "image": ["1", 0]
+    }
+  },
+  "3": {
+    "class_type": "Metric3D_DepthMapPreprocessor",
+    "inputs": {
+      "backbone": "vit_large",
+      "resolution": 1024,
+      "image": ["2", 0]
+    }
+  },
+  "4": {
+    "class_type": "ImageInvert",
+    "inputs": {
+      "image": ["3", 0]
+    }
+  },
+  "5": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "depth_output",
+      "images": ["4", 0]
+    }
+  }
+}
