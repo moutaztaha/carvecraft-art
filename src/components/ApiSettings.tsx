@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Settings, Cloud, Monitor, X } from "lucide-react";
+import { Settings, Cloud, Monitor, X, BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,7 +101,7 @@ export default function ApiSettings() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="endpoint" className="text-sm text-muted-foreground">
-                    ComfyUI Endpoint
+                    Bridge Server Endpoint
                   </Label>
                   <Input
                     id="endpoint"
@@ -108,19 +109,25 @@ export default function ApiSettings() {
                     onChange={(e) =>
                       setConfig((c) => ({ ...c, localEndpoint: e.target.value }))
                     }
-                    placeholder="http://localhost:8188"
+                    placeholder="http://localhost:8000"
                     className="font-mono text-sm"
                   />
                 </div>
-                <div className="text-xs text-muted-foreground font-mono bg-secondary/50 p-3 rounded-lg space-y-2">
-                  <p className="font-semibold text-foreground">Local Setup:</p>
-                  <ol className="list-decimal list-inside space-y-1">
-                    <li>Install ComfyUI with Flux model</li>
-                    <li>Enable <code className="text-primary">--listen 0.0.0.0</code> and <code className="text-primary">--enable-cors-header</code></li>
-                    <li>Load a depth-map workflow (img2img with depth ControlNet)</li>
-                    <li>The app sends your image to <code className="text-primary">/api/prompt</code></li>
-                  </ol>
-                </div>
+                <p className="text-xs text-muted-foreground font-mono bg-secondary/50 p-3 rounded-lg">
+                  Runs depth maps on your local GPU via ComfyUI + Python bridge. No internet needed.
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-primary"
+                  onClick={() => {
+                    setOpen(false);
+                    window.location.href = "/local-setup";
+                  }}
+                >
+                  <BookOpen className="w-4 h-4 mr-1" />
+                  View Full Setup Guide
+                </Button>
               </div>
             )}
 
