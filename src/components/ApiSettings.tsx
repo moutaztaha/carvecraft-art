@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Settings, Cloud, Monitor, X } from "lucide-react";
+import { Settings, Cloud, Monitor, X, BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
