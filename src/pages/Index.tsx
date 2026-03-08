@@ -92,7 +92,7 @@ const Index = () => {
           </motion.div>
         )}
 
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Source Image Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
