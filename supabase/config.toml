@@ -1,0 +1,4 @@
+project_id = "uqzdrlypicepmeyhaudo"
+
+[functions.generate-depth-map]
+verify_jwt = false
