@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import ImageUpload from "@/components/ImageUpload";
 import DepthMapDisplay from "@/components/DepthMapDisplay";
 import ReliefViewer from "@/components/ReliefViewer";
+import ApiSettings, { getApiConfig } from "@/components/ApiSettings";
+import { generateDepthMapLocal } from "@/lib/localApi";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
