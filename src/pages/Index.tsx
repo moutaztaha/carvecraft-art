@@ -1,4 +1,4 @@
-import { useState, Suspense } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
