@@ -48,22 +48,30 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash-image",
+          model: "google/gemini-3-pro-image-preview",
           messages: [
             {
               role: "user",
               content: [
                 {
                   type: "text",
-                  text: `Convert this line art image into a high-quality grayscale depth map suitable for CNC bas-relief engraving. The depth map should have:
-- White areas (255) representing the highest/closest points (raised relief)
-- Black areas (0) representing the lowest/deepest points (background)
-- Smooth gradients between levels to create natural-looking 3D relief
-- The ornamental details should have realistic depth variation with rounded, sculptural forms
-- Background should be dark/black
-- The main design elements should have varying levels of gray to white showing 3D volume
-- Edges should have smooth transitions, not sharp cutoffs
-- Generate ONLY the depth map image, no text overlay, no labels. Output just the grayscale depth map image.`,
+                  text: `You are an expert 3D sculptor and CNC depth map artist. Convert this line art / ornament image into a professional-grade grayscale depth map for CNC bas-relief carving.
+
+CRITICAL REQUIREMENTS for the depth map:
+1. PURE GRAYSCALE image — no color, no text, no labels, no watermarks
+2. BLACK background (value 0) = the flat base/lowest point
+3. WHITE (value 255) = the highest raised point of the relief
+4. Use the FULL grayscale range (0-255) with SMOOTH, CONTINUOUS gradients
+5. Every ornamental element must have ROUNDED, SCULPTURAL volume — imagine you are sculpting clay
+6. Leaves and petals should have smooth convex curvature with soft rollover at edges
+7. Curls and scrolls must show overlapping depth — parts in front are brighter than parts behind
+8. Create SOFT SHADOWS between overlapping elements using darker grays
+9. Edges of ornament elements should have smooth gradient falloff into the background — NO hard/sharp cutoffs
+10. Add subtle depth variation WITHIN each element (center slightly higher than edges) to create realistic 3D volume
+11. The background around the ornament should smoothly fade to pure black with a gentle vignette
+12. Think of this as a height map where every pixel's brightness = its physical height
+
+The result should look like a professional CNC depth map with rich tonal gradients, similar to what a master sculptor would create — smooth, organic, with clear depth layering between overlapping elements. Output ONLY the depth map image.`,
                 },
                 {
                   type: "image_url",
