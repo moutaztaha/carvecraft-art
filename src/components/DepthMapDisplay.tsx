@@ -23,7 +23,7 @@ const DEFAULT_ADJUSTMENTS: Adjustments = {
   depthIntensity: 100,
 };
 
-const DepthMapDisplay = ({ depthMapUrl }: DepthMapDisplayProps) => {
+const DepthMapDisplay = ({ depthMapUrl, onProcessedUrlChange }: DepthMapDisplayProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sourceImageRef = useRef<HTMLImageElement | null>(null);
   const [adjustments, setAdjustments] = useState<Adjustments>(DEFAULT_ADJUSTMENTS);
