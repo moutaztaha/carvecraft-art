@@ -1,4 +1,4 @@
-import { useState, Suspense } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,17 @@ const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<"depth" | "3d">("depth");
   const [quality, setQuality] = useState<"fast" | "high">("high");
+  const [processedDepthMap, setProcessedDepthMap] = useState<string | null>(null);
+
+  const handleProcessedUrlChange = useCallback((url: string) => {
+    setProcessedDepthMap(url);
+  }, []);
 
   const generateDepthMap = async () => {
     if (!sourceImage) return;
     setIsGenerating(true);
     setDepthMap(null);
+    setProcessedDepthMap(null);
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-depth-map", {
@@ -214,7 +220,7 @@ const Index = () => {
                       </button>
                     </div>
 
-                    {activeTab === "depth" && <DepthMapDisplay depthMapUrl={depthMap} />}
+                    {activeTab === "depth" && <DepthMapDisplay depthMapUrl={depthMap} onProcessedUrlChange={handleProcessedUrlChange} />}
                     {activeTab === "3d" && (
                       <Suspense
                         fallback={
@@ -223,7 +229,7 @@ const Index = () => {
                           </div>
                         }
                       >
-                        <ReliefViewer depthMapUrl={depthMap} />
+                        <ReliefViewer depthMapUrl={processedDepthMap || depthMap} />
                       </Suspense>
                     )}
 

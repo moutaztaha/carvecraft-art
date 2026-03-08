@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 interface DepthMapDisplayProps {
   depthMapUrl: string;
+  onProcessedUrlChange?: (url: string) => void;
 }
 
 interface Adjustments {
@@ -22,7 +23,7 @@ const DEFAULT_ADJUSTMENTS: Adjustments = {
   depthIntensity: 100,
 };
 
-const DepthMapDisplay = ({ depthMapUrl }: DepthMapDisplayProps) => {
+const DepthMapDisplay = ({ depthMapUrl, onProcessedUrlChange }: DepthMapDisplayProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sourceImageRef = useRef<HTMLImageElement | null>(null);
   const [adjustments, setAdjustments] = useState<Adjustments>(DEFAULT_ADJUSTMENTS);
@@ -82,7 +83,9 @@ const DepthMapDisplay = ({ depthMapUrl }: DepthMapDisplayProps) => {
     }
 
     ctx.putImageData(imageData, 0, 0);
-    setProcessedUrl(canvas.toDataURL("image/png"));
+    const url = canvas.toDataURL("image/png");
+    setProcessedUrl(url);
+    onProcessedUrlChange?.(url);
   }, [adjustments]);
 
   useEffect(() => {
