@@ -13,6 +13,7 @@ const Index = () => {
   const [depthMap, setDepthMap] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<"depth" | "3d">("depth");
+  const [quality, setQuality] = useState<"fast" | "high">("high");
 
   const generateDepthMap = async () => {
     if (!sourceImage) return;
