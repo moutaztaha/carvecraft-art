@@ -89,9 +89,12 @@ const Index = () => {
               <span className="text-foreground">Forge</span>
             </h1>
           </div>
-          <p className="text-sm text-muted-foreground hidden sm:block font-mono">
-            Line Art → Depth Map → CNC Relief
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-muted-foreground hidden sm:block font-mono">
+              Line Art → Depth Map → CNC Relief
+            </p>
+            <ApiSettings />
+          </div>
         </div>
       </header>
 
