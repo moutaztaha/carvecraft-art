@@ -29,29 +29,42 @@ const Index = () => {
     setProcessedDepthMap(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke("generate-depth-map", {
-        body: { imageBase64: sourceImage, quality },
-      });
+      const apiConfig = getApiConfig();
 
-      if (error) {
-        console.error("Function error:", error);
-        toast.error("Failed to generate depth map. Please try again.");
-        return;
-      }
+      if (apiConfig.mode === "local") {
+        // Local ComfyUI generation
+        const result = await generateDepthMapLocal(sourceImage, quality);
+        if (result) {
+          setDepthMap(result);
+          setActiveTab("depth");
+          toast.success("Depth map generated locally!");
+        }
+      } else {
+        // Cloud AI generation
+        const { data, error } = await supabase.functions.invoke("generate-depth-map", {
+          body: { imageBase64: sourceImage, quality },
+        });
 
-      if (data?.error) {
-        toast.error(data.error);
-        return;
-      }
+        if (error) {
+          console.error("Function error:", error);
+          toast.error("Failed to generate depth map. Please try again.");
+          return;
+        }
 
-      if (data?.depthMap) {
-        setDepthMap(data.depthMap);
-        setActiveTab("depth");
-        toast.success("Depth map generated successfully!");
+        if (data?.error) {
+          toast.error(data.error);
+          return;
+        }
+
+        if (data?.depthMap) {
+          setDepthMap(data.depthMap);
+          setActiveTab("depth");
+          toast.success("Depth map generated successfully!");
+        }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error:", err);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(err?.message || "Something went wrong. Please try again.");
     } finally {
       setIsGenerating(false);
     }
