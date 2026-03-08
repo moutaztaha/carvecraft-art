@@ -3,9 +3,75 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { Slider } from "@/components/ui/slider";
-import { RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RotateCcw, Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
+/** Export a THREE.BufferGeometry as a binary STL file and trigger download. */
+function exportSTL(geometry: THREE.BufferGeometry, filename: string) {
+  // Ensure we have non-indexed geometry for STL
+  const geo = geometry.index ? geometry.toNonIndexed() : geometry;
+  const positions = geo.getAttribute("position");
+  const normals = geo.getAttribute("normal");
+
+  if (!positions) return;
+
+  const triangles = positions.count / 3;
+  const bufferLength = 80 + 4 + triangles * 50; // header + count + triangles
+  const buffer = new ArrayBuffer(bufferLength);
+  const dv = new DataView(buffer);
+
+  // 80-byte header
+  let offset = 80;
+
+  // Number of triangles
+  dv.setUint32(offset, triangles, true);
+  offset += 4;
+
+  const vA = new THREE.Vector3();
+  const vB = new THREE.Vector3();
+  const vC = new THREE.Vector3();
+  const cb = new THREE.Vector3();
+  const ab = new THREE.Vector3();
+
+  for (let i = 0; i < triangles; i++) {
+    const i3 = i * 3;
+
+    vA.fromBufferAttribute(positions, i3);
+    vB.fromBufferAttribute(positions, i3 + 1);
+    vC.fromBufferAttribute(positions, i3 + 2);
+
+    // Compute face normal
+    cb.subVectors(vC, vB);
+    ab.subVectors(vA, vB);
+    cb.cross(ab).normalize();
+
+    // Normal
+    dv.setFloat32(offset, cb.x, true); offset += 4;
+    dv.setFloat32(offset, cb.y, true); offset += 4;
+    dv.setFloat32(offset, cb.z, true); offset += 4;
+
+    // Vertices
+    for (const v of [vA, vB, vC]) {
+      dv.setFloat32(offset, v.x, true); offset += 4;
+      dv.setFloat32(offset, v.y, true); offset += 4;
+      dv.setFloat32(offset, v.z, true); offset += 4;
+    }
+
+    // Attribute byte count
+    dv.setUint16(offset, 0, true); offset += 2;
+  }
+
+  const blob = new Blob([buffer], { type: "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 interface ReliefSettings {
   width: number;
@@ -244,7 +310,7 @@ interface ReliefMeshProps {
 
 const RESOLUTION = 200; // mesh resolution
 
-const ReliefMesh = ({ depthMapUrl, settings }: ReliefMeshProps) => {
+const ReliefMeshWithExport = ({ depthMapUrl, settings, onGeometryReady }: ReliefMeshProps & { onGeometryReady: (g: THREE.BufferGeometry | null) => void }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
@@ -262,13 +328,16 @@ const ReliefMesh = ({ depthMapUrl, settings }: ReliefMeshProps) => {
     const resX = RESOLUTION;
     const resY = Math.round(RESOLUTION / aspect);
 
-    // Scale to mm - normalize so largest side = settings dimension
     const physW = settings.width;
     const physH = settings.height;
 
     const depths = readDepthPixels(image, resX, resY, settings.smoothing, settings.invertImage);
     return buildReliefGeometry(depths, resX, resY, physW, physH, settings.baseThickness, settings.reliefDepth);
   }, [image, settings]);
+
+  useEffect(() => {
+    onGeometryReady(geometry);
+  }, [geometry, onGeometryReady]);
 
   if (!geometry) return null;
 
@@ -301,10 +370,20 @@ interface ReliefViewerProps {
 
 const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
   const [settings, setSettings] = useState<ReliefSettings>(DEFAULT_SETTINGS);
+  const [currentGeometry, setCurrentGeometry] = useState<THREE.BufferGeometry | null>(null);
   const isModified = JSON.stringify(settings) !== JSON.stringify(DEFAULT_SETTINGS);
 
   const update = (key: keyof ReliefSettings, value: number | boolean) =>
     setSettings((prev) => ({ ...prev, [key]: value }));
+
+  const handleExportSTL = () => {
+    if (!currentGeometry) {
+      toast.error("No 3D model to export yet.");
+      return;
+    }
+    exportSTL(currentGeometry, "relief-model.stl");
+    toast.success("STL file downloaded!");
+  };
 
   const sliders: {
     key: keyof ReliefSettings;
@@ -335,7 +414,7 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
           <directionalLight position={[100, -100, 150]} intensity={1.2} castShadow />
           <directionalLight position={[-80, 60, 80]} intensity={0.4} color="hsl(30, 60%, 80%)" />
           <pointLight position={[0, 0, 120]} intensity={0.5} />
-          <ReliefMesh depthMapUrl={depthMapUrl} settings={settings} />
+          <ReliefMeshWithExport depthMapUrl={depthMapUrl} settings={settings} onGeometryReady={setCurrentGeometry} />
           <AutoFit settings={settings} />
           <OrbitControls
             enableZoom
@@ -393,6 +472,12 @@ const ReliefViewer = ({ depthMapUrl }: ReliefViewerProps) => {
           />
         </div>
       </div>
+
+      {/* Export Button */}
+      <Button onClick={handleExportSTL} variant="hero" size="lg" className="w-full">
+        <Download className="w-5 h-5 mr-2" />
+        Export STL for CNC
+      </Button>
     </div>
   );
 };
