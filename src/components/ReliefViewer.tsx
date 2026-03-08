@@ -310,7 +310,7 @@ interface ReliefMeshProps {
 
 const RESOLUTION = 200; // mesh resolution
 
-const ReliefMesh = ({ depthMapUrl, settings }: ReliefMeshProps) => {
+const ReliefMeshWithExport = ({ depthMapUrl, settings, onGeometryReady }: ReliefMeshProps & { onGeometryReady: (g: THREE.BufferGeometry | null) => void }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
@@ -328,13 +328,16 @@ const ReliefMesh = ({ depthMapUrl, settings }: ReliefMeshProps) => {
     const resX = RESOLUTION;
     const resY = Math.round(RESOLUTION / aspect);
 
-    // Scale to mm - normalize so largest side = settings dimension
     const physW = settings.width;
     const physH = settings.height;
 
     const depths = readDepthPixels(image, resX, resY, settings.smoothing, settings.invertImage);
     return buildReliefGeometry(depths, resX, resY, physW, physH, settings.baseThickness, settings.reliefDepth);
   }, [image, settings]);
+
+  useEffect(() => {
+    onGeometryReady(geometry);
+  }, [geometry, onGeometryReady]);
 
   if (!geometry) return null;
 
