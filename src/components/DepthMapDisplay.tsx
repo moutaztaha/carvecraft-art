@@ -83,7 +83,9 @@ const DepthMapDisplay = ({ depthMapUrl, onProcessedUrlChange }: DepthMapDisplayP
     }
 
     ctx.putImageData(imageData, 0, 0);
-    setProcessedUrl(canvas.toDataURL("image/png"));
+    const url = canvas.toDataURL("image/png");
+    setProcessedUrl(url);
+    onProcessedUrlChange?.(url);
   }, [adjustments]);
 
   useEffect(() => {
