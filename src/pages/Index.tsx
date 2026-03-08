@@ -14,6 +14,11 @@ const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<"depth" | "3d">("depth");
   const [quality, setQuality] = useState<"fast" | "high">("high");
+  const [processedDepthMap, setProcessedDepthMap] = useState<string | null>(null);
+
+  const handleProcessedUrlChange = useCallback((url: string) => {
+    setProcessedDepthMap(url);
+  }, []);
 
   const generateDepthMap = async () => {
     if (!sourceImage) return;
